@@ -1,4 +1,4 @@
-const API_KEY = process.env.API_KEY;
+const API_KEY = "__API_KEY__";
 const API_BASE_URL = 'https://creativecommons.tankerkoenig.de/json/list.php';
 
 const elements = {
