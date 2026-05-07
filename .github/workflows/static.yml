@@ -37,7 +37,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Replace API key
         run: |
-          sed -i "s|__API_KEY__|$API_KEY|g" script.js
+          sed -i "s|__API_KEY__|$API_KEY|g" app.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
