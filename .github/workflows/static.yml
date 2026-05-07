@@ -1,4 +1,4 @@
-name: Deploy static content to Pages
+name: Deploy static site to GitHub Pages
 
 on:
   push:
@@ -16,60 +16,28 @@ concurrency:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-
-    env:
-      API_KEY: ${{ vars.API_KEY }}  # oder secrets.API_KEY wenn du Secret nutzt
 
     steps:
+      # 1. Code holen
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Pages vorbereiten
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      # ----------------------------
-      # 1. Build folder erstellen
-      # ----------------------------
-      - name: Create build folder
-        run: |
-          rm -rf dist
-          mkdir dist
-          cp -r * dist/ || true
-
-      # ----------------------------
-      # 2. API Key sicher ersetzen
-      # ----------------------------
-      - name: Inject API key
-        run: |
-          echo "Before replace:"
-          grep API_KEY dist/app.js || true
-
-          sed -i "s|__API_KEY__|$API_KEY|g" dist/app.js
-
-          echo "After replace:"
-          grep API_KEY dist/app.js || true
-
-      # ----------------------------
-      # 3. Final check (wichtig!)
-      # ----------------------------
-      - name: Verify final file
-        run: cat dist/app.js
-
-      # ----------------------------
-      # 4. Upload artifact
-      # ----------------------------
+      # 3. Upload (alles statisch)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist'
+          path: '.'
 
-      # ----------------------------
-      # 5. Deploy
-      # ----------------------------
+      # 4. Deploy
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
