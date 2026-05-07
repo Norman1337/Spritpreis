@@ -1,5 +1,4 @@
-const API_KEY = "__API_KEY__";
-const API_BASE_URL = 'https://creativecommons.tankerkoenig.de/json/list.php';
+const API_BASE_URL = "https://hello-world-worker.jannis-knatz.workers.dev";
 
 const elements = {
     getLocationBtn: document.getElementById('getLocationBtn'),
@@ -14,11 +13,12 @@ const elements = {
     results: document.getElementById('results')
 };
 
-// Event Listeners
+// Radius Slider
 elements.radInput.addEventListener('input', (e) => {
     elements.radValue.textContent = e.target.value;
 });
 
+// Standort Button
 elements.getLocationBtn.addEventListener('click', () => {
     if (!navigator.geolocation) {
         showError('Geolokalisierung wird von deinem Browser nicht unterstützt.');
@@ -36,7 +36,10 @@ elements.getLocationBtn.addEventListener('click', () => {
             elements.getLocationBtn.disabled = false;
         },
         (error) => {
-            const errorMsg = error.code === 1 ? 'Standortzugriff verweigert.' : 'Standort konnte nicht ermittelt werden.';
+            const errorMsg = error.code === 1
+                ? 'Standortzugriff verweigert.'
+                : 'Standort konnte nicht ermittelt werden.';
+
             showError(errorMsg);
             elements.getLocationBtn.textContent = '📍 Mein Standort';
             elements.getLocationBtn.disabled = false;
@@ -49,6 +52,7 @@ elements.searchBtn.addEventListener('click', fetchStations);
 function showError(message) {
     elements.errorMessage.textContent = message;
     elements.errorPanel.classList.remove('hidden');
+
     setTimeout(() => {
         elements.errorPanel.classList.add('hidden');
     }, 5000);
@@ -65,6 +69,7 @@ function showLoading(show) {
     }
 }
 
+// 🔥 API CALL (JETZT ÜBER CLOUDFLARE WORKER)
 async function fetchStations() {
     const lat = elements.latInput.value;
     const lng = elements.lngInput.value;
@@ -79,9 +84,10 @@ async function fetchStations() {
     elements.errorPanel.classList.add('hidden');
 
     try {
-        const url = `${API_BASE_URL}?lat=${lat}&lng=${lng}&rad=${rad}&sort=dist&type=all&apikey=${API_KEY}`;
+        const url = `${API_BASE_URL}?lat=${lat}&lng=${lng}&rad=${rad}`;
+
         const response = await fetch(url);
-        
+
         if (!response.ok) {
             throw new Error(`Netzwerkfehler: ${response.status}`);
         }
@@ -93,6 +99,7 @@ async function fetchStations() {
         }
 
         displayResults(data.stations);
+
     } catch (error) {
         showError(`Fehler beim Laden der Daten: ${error.message}`);
     } finally {
@@ -100,6 +107,7 @@ async function fetchStations() {
     }
 }
 
+// Ergebnisanzeige
 function displayResults(stations) {
     elements.results.innerHTML = '';
 
@@ -140,7 +148,7 @@ function displayResults(stations) {
                     ${statusText}
                 </div>
             </header>
-            
+
             <div class="distance">
                 📍 ${station.dist.toFixed(1)} km entfernt
             </div>
@@ -149,19 +157,19 @@ function displayResults(stations) {
                 ${station.diesel != null ? `
                 <div class="price-item diesel">
                     <span class="price-label">Diesel</span>
-                    <span class="price-value">${formatPrice(station.diesel)} <span class="currency">€</span></span>
+                    <span class="price-value">${formatPrice(station.diesel)} €</span>
                 </div>` : ''}
-                
+
                 ${station.e5 != null ? `
                 <div class="price-item e5">
                     <span class="price-label">Super E5</span>
-                    <span class="price-value">${formatPrice(station.e5)} <span class="currency">€</span></span>
+                    <span class="price-value">${formatPrice(station.e5)} €</span>
                 </div>` : ''}
-                
+
                 ${station.e10 != null ? `
                 <div class="price-item e10">
                     <span class="price-label">Super E10</span>
-                    <span class="price-value">${formatPrice(station.e10)} <span class="currency">€</span></span>
+                    <span class="price-value">${formatPrice(station.e10)} €</span>
                 </div>` : ''}
             </div>
         `;
