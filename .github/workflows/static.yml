@@ -38,6 +38,15 @@ jobs:
       - name: Replace API key
         run: |
           sed -i "s|__API_KEY__|$API_KEY|g" app.js
+      - name: Debug API key length
+        run: |
+          echo "Length:"
+          echo ${#API_KEY}
+
+      - name: Debug replacement
+        run: |
+          grep API_KEY app.js || true
+          cat app.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
