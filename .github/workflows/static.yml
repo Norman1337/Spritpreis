@@ -29,7 +29,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     env:
-      API_KEY: ${{ secrets.API_KEY }}
+      API_KEY: ${{ vars.API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,22 +37,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Replace API key
         run: |
-          echo "BEFORE:"
-          grep API_KEY app.js || true
-
           sed -i "s|__API_KEY__|$API_KEY|g" app.js
-
-          echo "AFTER:"
-          grep API_KEY app.js || true
-      - name: Debug API key length
-        run: |
-          echo "Length:"
-          echo ${#API_KEY}
-
-      - name: Debug replacement
-        run: |
-          grep API_KEY app.js || true
-          cat app.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
